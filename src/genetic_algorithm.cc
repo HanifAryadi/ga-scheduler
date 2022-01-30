@@ -29,6 +29,9 @@ void GeneticAlgorithm::selection(const SortedEncodedSolutionSet& sorted_pop, Enc
 }
 
 void crossoverOS(std::vector<std::string>& OS1, std::vector<std::string>& OS2, const Problem& problem) {
+  
+  if(OS1.size() <= 1) return;
+  
   int num_of_jobs = problem.jobs.size();
 
   struct timespec ts;
@@ -91,6 +94,9 @@ void crossoverOS(std::vector<std::string>& OS1, std::vector<std::string>& OS2, c
 }
 
 void crossoverMS(std::vector<int>& MS1, std::vector<int>& MS2) {
+  
+  if(MS1.size() <= 1) return;
+
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
   srand((time_t)ts.tv_nsec);
@@ -127,12 +133,15 @@ void crossoverMS(std::vector<int>& MS1, std::vector<int>& MS2) {
     iter_2++;
   }
 }
-
+#include<ros/ros.h>
 void crossoverTS(std::vector<int>& TS1, std::vector<int>& TS2) { // two-point crossover
+  
+  if(TS1.size() <= 1) return;
+
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
-  srand((time_t)ts.tv_nsec);
-  
+  srand((time_t)ts.tv_nsec);  
+
   int pos_1 = rand() % (TS1.size()-1);
   int pos_2 = rand() % (TS1.size()-1);
 

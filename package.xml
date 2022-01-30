@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ga_scheduler</name>
+  <version>0.0.0</version>
+  <description>Scheduler using genetic algorithm</description>
+  <maintainer email="aryadi.hanif@rm.is.tohoku.ac.jp">Hanif</maintainer>
+  
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <depend>message_runtime</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>roslaunch</depend>
+
+</package>

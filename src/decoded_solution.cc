@@ -223,14 +223,18 @@ void addTransporterTask(std::string from_op_name, std::string to_op_name, int ea
 
 
 DecodedSolution decode(const EncodedSolution& code, const Problem& problem) {
-  std::unordered_map<int, std::set<DecodedSolution::MachineTask>> machine_schedule;
-  std::unordered_map<int, std::set<DecodedSolution::TransporterTask>> transporter_schedule;
+  std::unordered_map<MachineNum, 
+                     std::set<DecodedSolution::MachineTask>> 
+                     machine_schedule;
+  std::unordered_map<TransporterNum, 
+                     std::set<DecodedSolution::TransporterTask>> 
+                     transporter_schedule;
 
   // Initialize empty schedule
-  for(int i = 1; i <= problem.machines.size(); i++) {
+  for(MachineNum i = 1; i <= problem.machines.size(); i++) {
     machine_schedule.insert(std::make_pair(i, std::set<DecodedSolution::MachineTask>()));
   }
-  for(int i = 1; i <= problem.numOfTransporters; i++) {
+  for(TransporterNum i = 1; i <= problem.numOfTransporters; i++) {
     transporter_schedule.insert(std::make_pair(i, std::set<DecodedSolution::TransporterTask>()));
   }
 
@@ -300,7 +304,7 @@ DecodedSolution decode(const EncodedSolution& code, const Problem& problem) {
 }
 
 
-int DecodedSolution::getMakespan() const {
+Duration DecodedSolution::getMakespan() const {
   int makespan = 0;
   for(auto& machine: machineSchedule) {
     if(machine.second.empty()) continue;
