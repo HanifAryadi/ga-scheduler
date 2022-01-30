@@ -19,9 +19,9 @@ Problem Problem::loadProblem(const std::string input_file) {
   int num_of_jobs, num_of_machines, num_of_transporters;
   iss >> num_of_jobs >> num_of_machines >> num_of_transporters;
 
-  std::unordered_map<int, Problem::Job> jobs;
+  std::unordered_map<JobNum, Job> jobs;
 
-  for(int i = 1; i <= num_of_jobs; i++) {
+  for(JobNum i = 1; i <= num_of_jobs; i++) {
     std::getline(file, line);
     iss.clear();
     iss.str(line);
@@ -29,16 +29,17 @@ Problem Problem::loadProblem(const std::string input_file) {
     int num_of_operations;
     iss >> num_of_operations;
     
-    std::unordered_map<int, Problem::Job::Operation> operations;
+    std::unordered_map<OpNum, Operation> operations;
 
-    for(int j = 1; j <= num_of_operations; j++) {
+    for(OpNum j = 1; j <= num_of_operations; j++) {
       int num_of_machines;
       iss >> num_of_machines;
 
-      std::unordered_map<int, int> machine_num_to_op_duration;
+      std::unordered_map<MachineNum, Duration> machine_num_to_op_duration;
 
       for(int k = 0; k < num_of_machines; k++) {
-        int machine_num, duration;
+        MachineNum machine_num;
+        Duration duration;
         iss >> machine_num >> duration;
         machine_num_to_op_duration.insert(
           std::make_pair(machine_num, duration));
@@ -47,35 +48,35 @@ Problem Problem::loadProblem(const std::string input_file) {
       int num_of_prev_ops;
       iss >> num_of_prev_ops;
 
-      std::set<int> prev_ops;
+      std::set<OpNum> prev_ops;
 
       for(int k = 0; k < num_of_prev_ops; k++) {
-        int prev_op_num;
+        OpNum prev_op_num;
         iss >> prev_op_num;
         prev_ops.insert(prev_op_num);
 
         operations[prev_op_num].nextOps.insert(j);
       }
-      Problem::Job::Operation operation{i, j, prev_ops,
-                                        std::set<int>(), 
+      Operation operation{i, j, prev_ops,
+                                        std::set<OpNum>(), 
                                         machine_num_to_op_duration};
       operations.insert(std::make_pair(j, operation)); 
     }
 
-    Problem::Job job{i, operations};
+    Job job{i, operations};
     jobs.insert(std::make_pair(i, job));
   }
 
-  std::unordered_map<int, Problem::Machine> machines;
+  std::unordered_map<MachineNum, Machine> machines;
 
-  for(int i = 1; i <= num_of_machines; i++) {
-    std::unordered_map<int, int> machine_num_to_trp_duration;
+  for(MachineNum i = 1; i <= num_of_machines; i++) {
+    std::unordered_map<MachineNum, Duration> machine_num_to_trp_duration;
 
-    for(int j = 1; j <= num_of_machines; j++) {
+    for(MachineNum j = 1; j <= num_of_machines; j++) {
       machine_num_to_trp_duration.insert(std::make_pair(j, 0));
     }
 
-    Problem::Machine machine{i, machine_num_to_trp_duration};
+    Machine machine{i, machine_num_to_trp_duration};
     machines.insert(std::make_pair(i, machine));
   }
 
@@ -85,7 +86,7 @@ Problem Problem::loadProblem(const std::string input_file) {
     iss.str(line);
 
     for(int j = 0; j < num_of_machines-i; j++) {
-      int trp_duration;
+      Duration trp_duration;
       iss >> trp_duration;
       machines[i].machineNumToTrpDuration[i+j+1] = trp_duration;
       machines[i+j+1].machineNumToTrpDuration[i] = trp_duration;
@@ -97,7 +98,7 @@ Problem Problem::loadProblem(const std::string input_file) {
   return problem;
 }
 
-void getNum(const std::string string_rep, int& job_num, int& op_num) {
+void getNum(const std::string string_rep, JobNum& job_num, OpNum& op_num) {
   std::vector<std::string> v;
   std::stringstream ss(string_rep);
   while (ss.good()) {
@@ -111,8 +112,8 @@ void getNum(const std::string string_rep, int& job_num, int& op_num) {
 
 
 
-std::ostream& operator<<(std::ostream& os, const Problem::Job::Operation& o) {
-  std::map<int, int> sortedMachineNumToOpDuration(o.machineNumToOpDuration.begin(),
+std::ostream& operator<<(std::ostream& os, const Problem::Operation& o) {
+  std::map<MachineNum, Duration> sortedMachineNumToOpDuration(o.machineNumToOpDuration.begin(),
                                                   o.machineNumToOpDuration.end());
   os << "Operation " << o.jobNum << "-" << o.opNum << " (prevOps: [";
   bool addComma = false;
@@ -137,7 +138,7 @@ std::ostream& operator<<(std::ostream& os, const Problem::Job::Operation& o) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem::Job& j) {
-  std::map<int, Problem::Job::Operation> sortedOperations(j.operations.begin(),
+  std::map<OpNum, Problem::Operation> sortedOperations(j.operations.begin(),
                                                           j.operations.end());
   os << "Job " << j.jobNum << " [";
   bool addComma = false;
@@ -150,7 +151,7 @@ std::ostream& operator<<(std::ostream& os, const Problem::Job& j) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem::Machine& m) {
-  std::map<int, int> sortedMachineNumToTrpDuration(m.machineNumToTrpDuration.begin(),
+  std::map<MachineNum, Duration> sortedMachineNumToTrpDuration(m.machineNumToTrpDuration.begin(),
                                                    m.machineNumToTrpDuration.end());
   os << "Machine " << m.machineNum << " (machineNumToTrpDuration: [";
   bool addComma = false;
@@ -163,9 +164,9 @@ std::ostream& operator<<(std::ostream& os, const Problem::Machine& m) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Problem& p) {
-  std::map<int, Problem::Job> sortedJobs(p.jobs.begin(),
+  std::map<JobNum, Problem::Job> sortedJobs(p.jobs.begin(),
                                          p.jobs.end());
-  std::map<int, Problem::Machine> sortedMachines(p.machines.begin(),
+  std::map<MachineNum, Problem::Machine> sortedMachines(p.machines.begin(),
                                                  p.machines.end());
   os << "Problem (Jobs: [";
   bool addComma = false;
