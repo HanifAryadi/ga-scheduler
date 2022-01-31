@@ -10,6 +10,7 @@
 typedef int JobNum;
 typedef int OpNum;
 typedef int MachineNum;
+typedef int TransporterNum;
 typedef int Duration;
 
 struct Problem { 

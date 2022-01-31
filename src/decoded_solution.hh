@@ -4,13 +4,15 @@
 
 #include "encoded_solution.hh"
 
+
+
 struct DecodedSolution {
   struct MachineTask {
     std::string name;
-    int machineNum;
+    MachineNum machineNum;
     int start;
     int finish;
-    int duration;
+    Duration duration;
 
     inline bool operator<(const MachineTask &other) const {
       return start < other.start || 
@@ -25,13 +27,13 @@ struct DecodedSolution {
     };
 
     std::string name;
-    int transporterNum;
+    TransporterNum transporterNum;
     int start;
     int finish;
-    int duration;
+    Duration duration;
     Type taskType;
-    int fromMachineNum;
-    int toMachineNum;
+    MachineNum fromMachineNum;
+    MachineNum toMachineNum;
 
     inline bool operator<(const TransporterTask &other) const {
       return start < other.start || 
@@ -40,10 +42,10 @@ struct DecodedSolution {
   };
   typedef TransporterTask::Type TransporterTaskType;
 
-  std::unordered_map<int, std::set<MachineTask>> machineSchedule;
-  std::unordered_map<int, std::set<TransporterTask>> transporterSchedule;
+  std::unordered_map<MachineNum, std::set<MachineTask>> machineSchedule;
+  std::unordered_map<TransporterNum, std::set<TransporterTask>> transporterSchedule;
 
-  int getMakespan() const;
+  Duration getMakespan() const;
 
   void printToFile(const std::string) const; 
 };
