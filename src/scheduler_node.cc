@@ -93,7 +93,6 @@ void GAScheduler::solve(const Problem& problem) {
 
     stat_recorder.addStat(decode(best_solution, problem).getMakespan());
 
-    ROS_INFO_STREAM(current_iter);
     current_iter++;    
   }
 

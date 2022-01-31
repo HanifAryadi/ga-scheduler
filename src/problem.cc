@@ -50,17 +50,16 @@ Problem Problem::loadProblem(const std::string input_file) {
 
       std::set<OpNum> prev_ops;
 
-      for(int k = 0; k < num_of_prev_ops; k++) {
-        OpNum prev_op_num;
-        iss >> prev_op_num;
-        prev_ops.insert(prev_op_num);
-
-        operations[prev_op_num].nextOps.insert(j);
-      }
       Operation operation{i, j, prev_ops,
-                                        std::set<OpNum>(), 
-                                        machine_num_to_op_duration};
+                          std::set<OpNum>(), 
+                          machine_num_to_op_duration};
       operations.insert(std::make_pair(j, operation)); 
+    }
+
+    for(auto& op : operations) {
+      for(auto& prev_op : op.second.prevOps) {
+        operations.at(prev_op).nextOps.insert(op.first);
+      }
     }
 
     Job job{i, operations};

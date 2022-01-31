@@ -7,17 +7,11 @@ Problem loadProblemFromMsg(const ga_scheduler::Problem& msg) {
 
     std::unordered_map<OpNum, Problem::Operation> operations;
     for(auto& op_msg: job_msg.operations) {
-      assert(job_num == op_msg.job_num);
       int op_num = op_msg.operation_num;
 
       std::set<OpNum> prev_ops;
       for(auto& op: op_msg.prev_ops) {
         prev_ops.insert(op);
-      }
-
-      std::set<OpNum> next_ops;
-      for(auto& op: op_msg.next_ops) {
-        next_ops.insert(op);
       }
 
       std::unordered_map<MachineNum, Duration> 
@@ -31,8 +25,15 @@ Problem loadProblemFromMsg(const ga_scheduler::Problem& msg) {
       }      
 
       Problem::Operation operation{job_num, op_num, prev_ops, 
-                          next_ops, machine_num_to_op_duration};
+                                   std::set<OpNum>(), 
+                                   machine_num_to_op_duration};
       operations.insert(std::make_pair(op_num, operation));
+    }
+
+    for(auto& op : operations) {
+      for(auto& prev_op : op.second.prevOps) {
+        operations.at(prev_op).nextOps.insert(op.first);
+      }
     }
 
     Problem::Job job{job_num, operations};
